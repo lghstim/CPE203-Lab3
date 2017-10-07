@@ -57,13 +57,22 @@ public class LogAnalyzer
       //similar to processStartEntry, should store relevant view
       //data in a map - model on processStartEntry, but store
       //your data to represent a view in the map (not a list of strings)
-   private static void processViewEntry(final String[] words) {
+   private static void processViewEntry(
+         final String[] words, 
+         final Map<String, List<View>> viewsFromSession) 
+   {
       if (words.length != VIEW_NUM_FIELDS) {
          return;
       }
 
-      List<String> sessions = new LinkedList<>();
-      sessions.add(words[VIEW_SESSION_ID]);
+      List<View> views = viewsFromSession.get(words[VIEW_SESSION_ID]);
+      if (views == null)
+      {
+         views = new LinkedList<>();
+         viewsFromSession.put(words[VIEW_SESSION_ID], views);
+      }
+
+      views.add(new View(words[VIEW_PRODUCT_ID], words[VIEW_PRICE]));    
    }
    
 
