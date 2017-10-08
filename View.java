@@ -2,7 +2,7 @@ public class View {
    private int productID;
    private double productCost;
 
-   public View(product_id, product_cost) {
+   public View(String productID, double productCost) {
       this.productID = productID;
       this.productCost = productCost;
    }
