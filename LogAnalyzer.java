@@ -80,10 +80,21 @@ public class LogAnalyzer
       //data in a map - model on processStartEntry, but store
       //your data to represent a purchase in the map (not a list of strings)
    private static void processBuyEntry(
-      final String[] words
-      /* add parameters as needed */
-      )
+      final String[] words,
+      final Map<String, List<Buy>> buysFromSession)
    {
+      if (words.length != BUY_NUM_FIELDS) {
+         return;
+      }
+
+      List<Buy> buys = buysFromSession.get(words[BUY_SESSION_ID]);
+      if (buys == null)
+      {
+         buys = new LinkedList<>();
+         buysFromSession.put(words[BUY_SESSION_ID], buys);
+      }
+
+      buys.add(new Buy(words[BUY_PRODUCT_ID], words[BUY_PRICE], words[BUY_QUANTITY]));
    }
 
    private static void processEndEntry(final String[] words)
@@ -98,9 +109,9 @@ public class LogAnalyzer
       //to process the data using the methods you write above
    private static void processLine(
       final String line,
-      final Map<String, List<String>> sessionsFromCustomer
-      /* add parameters as needed */
-      )
+      final Map<String, List<String>> sessionsFromCustomer,
+      final Map<String, List<View>> viewsFromSession,
+      final Map<String, List<Buy>> buysFromSession)
    {
       final String[] words = line.split("\\h");
 
@@ -115,13 +126,13 @@ public class LogAnalyzer
             processStartEntry(words, sessionsFromCustomer);
             break;
          case VIEW_TAG:
-            processViewEntry(words /* add arguments as needed */ );
+            processViewEntry(words, viewsFromSession);
             break;
          case BUY_TAG:
-            processBuyEntry(words /* add arguments as needed */ );
+            processBuyEntry(words, buysFromSession);
             break;
          case END_TAG:
-            processEndEntry(words /* add arguments as needed */ );
+            processEndEntry(words); // TODO: ADD ARGUMENTS?
             break;
       }
    }
@@ -129,12 +140,44 @@ public class LogAnalyzer
       //write this after you have figured out how to store your data
       //make sure that you understand the problem
    private static void printSessionPriceDifference(
-      /* add parameters as needed */
-      )
+         final Map<String, List<String>> sessionsFromCustomer,
+         final Map<String, List<View>> viewsFromSession,
+         final Map<String, List<Buy>> buysFromSession
+         )
    {
       System.out.println("Price Difference for Purchased Product by Session");
+      
+      List<View> views = viewsFromSession.get(words[VIEW_SESSION_ID]);
+      // purchase prices:
+      for (Map.Entry<String, List<Buy>> entry : buysFromSession.entrySet())
+      {
+         List<Buy> buys = entry.getValue();
+         String sessionID = entry.getKey();
 
-      /* add printing */
+         // avg price of items viewed during session:
+         List<View> viewSession = viewsFromSession.get(sessionID); // get the val at the key
+         double avgPrice = getAveragePriceFromViewSession(viewSession);
+         System.out.println(sessionID);
+
+         for (Buy onePurchase : buys) 
+         {
+            double difference = onePurchase.getProductPrice() - avgPrice;
+            System.out.println("\t" + onePurchase.getProductID() + difference);
+         }
+      }
+   }
+
+   private static double getAveragePriceFromViewSession(List<View> viewSession)
+   {
+      double total_price = 0;
+      int items = 0;
+      for (View oneView : viewSession)
+      {
+         total_price += oneView.getPriceItem();
+         items += 1;
+      }
+
+      return total_price / items;
    }
 
       //write this after you have figured out how to store your data

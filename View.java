@@ -6,4 +6,6 @@ public class View {
       this.product_id = product_id;
       this.product_cost = product_cost;
    }
+
+   
 }
