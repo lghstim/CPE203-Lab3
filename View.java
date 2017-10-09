@@ -1,5 +1,5 @@
 public class View {
-   private int productID;
+   private String productID;
    private double productCost;
 
    public View(String productID, double productCost) {
@@ -10,6 +10,11 @@ public class View {
    public double getPriceItem()
    {
       return this.productCost;
+   }
+
+   public String getProduct()
+   {
+      return "View(String " + this.productID + " , double " + this.productCost + ")";
    }
 
    

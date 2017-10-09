@@ -72,7 +72,7 @@ public class LogAnalyzer
          viewsFromSession.put(words[VIEW_SESSION_ID], views);
       }
 
-      views.add(new View(words[VIEW_PRODUCT_ID], words[VIEW_PRICE]));    
+      views.add(new View(words[VIEW_PRODUCT_ID], Double.parseDouble(words[VIEW_PRICE])));    
    }
    
 
@@ -94,7 +94,7 @@ public class LogAnalyzer
          buysFromSession.put(words[BUY_SESSION_ID], buys);
       }
 
-      buys.add(new Buy(words[BUY_PRODUCT_ID], words[BUY_PRICE], words[BUY_QUANTITY]));
+      buys.add(new Buy(words[BUY_PRODUCT_ID], Double.parseDouble(words[BUY_PRICE]), Integer.parseInt(words[BUY_QUANTITY])));
    }
 
    private static void processEndEntry(final String[] words)
@@ -147,8 +147,7 @@ public class LogAnalyzer
    {
       System.out.println("Price Difference for Purchased Product by Session");
       
-      List<View> views = viewsFromSession.get(words[VIEW_SESSION_ID]);
-      // purchase prices:
+      // for each session id associated with a purchase, print for each productID, the purchase price minus avg price of items viewed during that session
       for (Map.Entry<String, List<Buy>> entry : buysFromSession.entrySet())
       {
          List<Buy> buys = entry.getValue();
@@ -162,7 +161,7 @@ public class LogAnalyzer
          for (Buy onePurchase : buys) 
          {
             double difference = onePurchase.getProductPrice() - avgPrice;
-            System.out.println("\t" + onePurchase.getProductID() + difference);
+            System.out.println("\t" + onePurchase.getProductID() + " " +  difference);
          }
       }
    }
@@ -183,36 +182,45 @@ public class LogAnalyzer
       //write this after you have figured out how to store your data
       //make sure that you understand the problem
    private static void printCustomerItemViewsForPurchase(
-      /* add parameters as needed */
+         final Map<String, List<String>> sessionsFromCustomer,
+         final Map<String, List<View>> viewsFromSession,
+         final Map<String, List<Buy>> buysFromSession
       )
    {
       System.out.println("Number of Views for Purchased Product by Customer");
 
-      /* add printing */
+      // for each product purchased, print # of sessions in which customer viewed THAT product.
+      /* int sessionCount = 0;
+      for (Map.Entry<String, List<Buy>> entry : buysFromSession.entrySet()) 
+      {
+      } */
+
+
+      
    }
 
       //write this after you have figured out how to store your data
       //make sure that you understand the problem
    private static void printStatistics(
-      /* add parameters as needed */
+         final Map<String, List<String>> sessionsFromCustomer,
+         final Map<String, List<View>> viewsFromSession,
+         final Map<String, List<Buy>> buysFromSession
       )
    {
-      printSessionPriceDifference( /*add arguments as needed */);
-      printCustomerItemViewsForPurchase( /*add arguments as needed */);
+      printSessionPriceDifference(sessionsFromCustomer, viewsFromSession, buysFromSession);
+      //printCustomerItemViewsForPurchase(Map<String, List<String>> sessionsFromCustomer, Map<String, List<View>> viewsFromSession, Map<String, List<Buy>> buysFromSession);
 
       /* This is commented out as it will not work until you read
          in your data to appropriate data structures, but is included
          to help guide your work - it is an example of printing the
-         data once propogated 
-         printOutExample(sessionsFromCustomer, viewsFromSession, buysFromSession);
-      */
-		
+         data once propogated  */
+      printOutExample(sessionsFromCustomer, viewsFromSession, buysFromSession);	
    }
 
    /* provided as an example of a method that might traverse your
       collections of data once they are written 
       commented out as the classes do not exist yet - write them! */
-/*
+
    private static void printOutExample(
       final Map<String, List<String>> sessionsFromCustomer,
       final Map<String, List<View>> viewsFromSession,
@@ -236,34 +244,34 @@ public class LogAnalyzer
          }
       }
    }
-*/
 
-      //called in populateDataStructures
+
+   //called in populateDataStructures
    private static void processFile(
       final Scanner input,
-      final Map<String, List<String>> sessionsFromCustomer
-      /* add parameters as needed */
+      final Map<String, List<String>> sessionsFromCustomer,
+      final Map<String, List<View>> viewsFromSession,
+      final Map<String, List<Buy>> buysFromSession
       )
    {
       while (input.hasNextLine())
       {
-         processLine(input.nextLine(), sessionsFromCustomer
-            /* add arguments as needed */ );
+         processLine(input.nextLine(), sessionsFromCustomer, viewsFromSession, buysFromSession);
       }
    }
 
       //called from main - mostly just pass through important data structures	
    private static void populateDataStructures(
       final String filename,
-      final Map<String, List<String>> sessionsFromCustomer
-      /* add parameters as needed */
+      final Map<String, List<String>> sessionsFromCustomer,
+      final Map<String, List<View>> viewsFromSession,
+      final Map<String, List<Buy>> buysFromSession
       )
       throws FileNotFoundException
    {
       try (Scanner input = new Scanner(new File(filename)))
       {
-         processFile(input, sessionsFromCustomer
-            /* add arguments as needed */ );
+         processFile(input, sessionsFromCustomer, viewsFromSession, buysFromSession);
       }
    }
 
@@ -284,6 +292,8 @@ public class LogAnalyzer
        * that customer.
        */
       final Map<String, List<String>> sessionsFromCustomer = new HashMap<>();
+      final Map<String, List<View>> viewsFromSession = new HashMap<>();
+      final Map<String, List<Buy>> buysFromSession = new HashMap<>();
 
       /* create additional data structures to hold relevant information */
       /* they will most likely be maps to important data in the logs */
@@ -292,12 +302,8 @@ public class LogAnalyzer
 
       try
       {
-         populateDataStructures(filename, sessionsFromCustomer
-            /* add parameters as needed */
-            );
-         printStatistics(
-            /* add parameters as needed */
-            );
+         populateDataStructures(filename, sessionsFromCustomer, viewsFromSession, buysFromSession);
+         printStatistics(sessionsFromCustomer, viewsFromSession, buysFromSession);
       }
       catch (FileNotFoundException e)
       {
