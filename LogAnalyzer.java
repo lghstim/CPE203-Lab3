@@ -72,7 +72,7 @@ public class LogAnalyzer
          viewsFromSession.put(words[VIEW_SESSION_ID], views);
       }
 
-      views.add(new View(words[VIEW_PRODUCT_ID], Double.parseDouble(words[VIEW_PRICE])));    
+      views.add(new View(words[VIEW_SESSION_ID], words[VIEW_PRODUCT_ID], Double.parseDouble(words[VIEW_PRICE])));    
    }
    
 
@@ -94,7 +94,7 @@ public class LogAnalyzer
          buysFromSession.put(words[BUY_SESSION_ID], buys);
       }
 
-      buys.add(new Buy(words[BUY_PRODUCT_ID], Double.parseDouble(words[BUY_PRICE]), Integer.parseInt(words[BUY_QUANTITY])));
+      buys.add(new Buy(words[BUY_SESSION_ID], words[BUY_PRODUCT_ID], Double.parseDouble(words[BUY_PRICE]), Integer.parseInt(words[BUY_QUANTITY])));
    }
 
    private static void processEndEntry(final String[] words)
@@ -136,6 +136,40 @@ public class LogAnalyzer
             break;
       }
    }
+
+   private static void printAverageViewsWithoutPurchase(final Map<String, List<String>> sessionsFromCustomer,
+         final Map<String, List<View>> viewsFromSession,
+         final Map<String, List<Buy>> buysFromSession
+         )
+   {
+      System.out.print("Average Views Without Purchase: ");
+      int totalViews = 0;
+      int sessions = 0;
+      for(Map.Entry<String, List<String>> entry: sessionsFromCustomer.entrySet())
+      {
+         List<String> sessionsOneCustomer = entry.getValue();
+         sessions += sessionsOneCustomer.size(); // keep track of total # sessions
+         for (String sessionID : sessionsOneCustomer)
+         {
+            List<Buy> buys = buysFromSession.get(sessionID);
+            if (buys == null) // if a buy wasn't made, add this session to our average
+            {
+               List<View> views = viewsFromSession.get(sessionID);
+               if (views != null)
+               {
+                  totalViews += views.size();
+               }
+            }
+            else
+            {
+               sessions -= 1; // kick out sessions where a buy was made.
+            }
+         }
+      }
+      double avg = totalViews / sessions;
+      System.out.print(avg + "\n");
+   }
+
 
       //write this after you have figured out how to store your data
       //make sure that you understand the problem
@@ -187,17 +221,38 @@ public class LogAnalyzer
          final Map<String, List<Buy>> buysFromSession
       )
    {
+      Map<String, Integer> productViewsForCustomer = new HashMap<>();
       System.out.println("Number of Views for Purchased Product by Customer");
-
-      // for each product purchased, print # of sessions in which customer viewed THAT product.
-      /* int sessionCount = 0;
-      for (Map.Entry<String, List<Buy>> entry : buysFromSession.entrySet()) 
+      int sessionsViewed = 0;
+      // compute # of sessions in which purchased item was viewed.
+      for (Map.Entry<String, List<String>> entry : sessionsFromCustomer.entrySet()) 
       {
-      } */
-
-
-      
+         String customerID = entry.getKey();
+         List<String> sessions = entry.getValue(); // sessions for one customer
+         System.out.println(customerID);
+         for(String sessionID : sessions)
+         {
+            List<Buy> buys = buysFromSession.get(sessionID);
+            for (Buy oneBuy : buys)
+            {
+               String productID = oneBuy.getProductID();
+               List<View> views = viewsFromSession.get(sessionID);
+               for (View oneView : views)
+               {
+                  if (oneView.getProductID() == oneBuy.getProductID()) // if item was viewed in session
+                  {
+                     sessionsViewed += 1;
+                     break;
+                  }
+               }
+               System.out.println("\t" + productID + " " + sessionsViewed);
+            }
+         }
+         sessionsViewed = 0;
+      }
    }
+
+
 
       //write this after you have figured out how to store your data
       //make sure that you understand the problem
@@ -207,14 +262,15 @@ public class LogAnalyzer
          final Map<String, List<Buy>> buysFromSession
       )
    {
+      printAverageViewsWithoutPurchase(sessionsFromCustomer, viewsFromSession, buysFromSession);
       printSessionPriceDifference(sessionsFromCustomer, viewsFromSession, buysFromSession);
-      //printCustomerItemViewsForPurchase(Map<String, List<String>> sessionsFromCustomer, Map<String, List<View>> viewsFromSession, Map<String, List<Buy>> buysFromSession);
+      printCustomerItemViewsForPurchase(sessionsFromCustomer, viewsFromSession, buysFromSession);
 
       /* This is commented out as it will not work until you read
          in your data to appropriate data structures, but is included
          to help guide your work - it is an example of printing the
          data once propogated  */
-      printOutExample(sessionsFromCustomer, viewsFromSession, buysFromSession);	
+      //printOutExample(sessionsFromCustomer, viewsFromSession, buysFromSession);	
    }
 
    /* provided as an example of a method that might traverse your
