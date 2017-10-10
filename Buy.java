@@ -26,4 +26,10 @@ public class Buy {
    {
       return this.buySessionID;
    }
+
+   public String toString()
+   {
+      return "Buy(String " + this.buySessionID + ", String " + this.buyProductID + " , double " + this.buyPrice + " , int " + this.buyQuantity + ")";
+   }
+
 }

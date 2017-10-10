@@ -179,7 +179,7 @@ public class LogAnalyzer
          final Map<String, List<Buy>> buysFromSession
          )
    {
-      System.out.println("Price Difference for Purchased Product by Session");
+      System.out.println("\n Price Difference for Purchased Product by Session");
       
       // for each session id associated with a purchase, print for each productID, the purchase price minus avg price of items viewed during that session
       for (Map.Entry<String, List<Buy>> entry : buysFromSession.entrySet())
@@ -222,7 +222,7 @@ public class LogAnalyzer
       )
    {
       Map<String, Integer> productViewsForCustomer = new HashMap<>();
-      System.out.println("Number of Views for Purchased Product by Customer");
+      System.out.println("\n Number of Views for Purchased Product by Customer");
       int sessionsViewed = 0;
       // compute # of sessions in which purchased item was viewed.
       for (Map.Entry<String, List<String>> entry : sessionsFromCustomer.entrySet()) 
@@ -233,22 +233,33 @@ public class LogAnalyzer
          for(String sessionID : sessions)
          {
             List<Buy> buys = buysFromSession.get(sessionID);
-            for (Buy oneBuy : buys)
+            if (buys != null)
             {
-               String productID = oneBuy.getProductID();
-               List<View> views = viewsFromSession.get(sessionID);
-               for (View oneView : views)
+               for (Buy oneBuy : buys)
                {
-                  if (oneView.getProductID() == oneBuy.getProductID()) // if item was viewed in session
+                  String productID = oneBuy.getProductID();
+                  List<String> allSessionsForCustomer = sessionsFromCustomer.get(customerID);
+                  for (String oneSessionID : allSessionsForCustomer)
                   {
-                     sessionsViewed += 1;
-                     break;
+                     List<View> views = viewsFromSession.get(oneSessionID);
+                     if (views != null)
+                     {
+                        for (View oneView : views)
+                        {
+                           if (oneView.getProductID().equals(oneBuy.getProductID()))
+                           {
+                              sessionsViewed += 1;
+                              break;
+                           }
+                        }
+                     }
                   }
+               
+                  System.out.println("\t" + productID + " " + sessionsViewed);
+                  sessionsViewed = 0;
                }
-               System.out.println("\t" + productID + " " + sessionsViewed);
             }
          }
-         sessionsViewed = 0;
       }
    }
 

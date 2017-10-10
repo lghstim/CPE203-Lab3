@@ -18,6 +18,11 @@ public class View {
    {
       return "View(String " + this.productID + " , double " + this.productCost + ")";
    }
+   
+   public String toString()
+   {
+      return "View(String " + this.viewSessionID + ", String " + this.productID + " , double " + this.productCost + ")";
+   }
 
    public String getProductID()
    {
