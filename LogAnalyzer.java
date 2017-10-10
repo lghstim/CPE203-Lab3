@@ -179,7 +179,7 @@ public class LogAnalyzer
          final Map<String, List<Buy>> buysFromSession
          )
    {
-      System.out.println("\n Price Difference for Purchased Product by Session");
+      System.out.println("\nPrice Difference for Purchased Product by Session");
       
       // for each session id associated with a purchase, print for each productID, the purchase price minus avg price of items viewed during that session
       for (Map.Entry<String, List<Buy>> entry : buysFromSession.entrySet())
@@ -222,7 +222,7 @@ public class LogAnalyzer
       )
    {
       Map<String, Integer> productViewsForCustomer = new HashMap<>();
-      System.out.println("\n Number of Views for Purchased Product by Customer");
+      System.out.println("\nNumber of Views for Purchased Product by Customer");
       int sessionsViewed = 0;
       // compute # of sessions in which purchased item was viewed.
       for (Map.Entry<String, List<String>> entry : sessionsFromCustomer.entrySet()) 
