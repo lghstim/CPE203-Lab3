@@ -166,7 +166,7 @@ public class LogAnalyzer
             }
          }
       }
-      double avg = totalViews / sessions;
+      double avg = (double)totalViews / sessions;
       System.out.print(avg + "\n");
    }
 
